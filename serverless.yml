@@ -1,0 +1,46 @@
+org: jschuur
+app: learnbyvideo-cron-test
+service: learnbyvideo-cron-test
+
+plugins:
+  - serverless-dotenv-plugin
+  - serverless-webpack
+  - serverless-webpack-prisma
+
+custom:
+  webpack:
+    includeModules: true
+
+frameworkVersion: '3'
+
+provider:
+  name: aws
+  runtime: nodejs16.x
+  memorySize: 512
+
+functions:
+  helloWorld:
+    handler: src/functions/hello.handler
+    events:
+      - httpApi:
+          path: /helloWorld
+          method: get
+  channelTest:
+    handler: src/functions/channelTest.handler
+    events:
+      - httpApi:
+          path: /channelTest
+          method: get
+      - schedule:
+          # rate: rate(1 minute)
+          rate: cron(12 */12 * * ? *)
+          enabled: false
+          input:
+            count: 20
+  updateChannels:
+    handler: src/functions/updateChannels.handler
+    timeout: 900
+    events:
+      - schedule:
+          rate: cron(12 */12 * * ? *)
+          enabled: false
