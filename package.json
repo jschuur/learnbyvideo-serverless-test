@@ -8,33 +8,48 @@
   "scripts": {
     "dev": "sls offline",
     "lint": "eslint .",
-    "deploy": "NODE_ENV=production sls deploy",
-    "db:migrate:prod": "dotenv-cli -e .env.production npx prisma migrate deploy",
-    "channels": "node src/cli/channelTest.js",
+    "deploy": "NODE_ENV=production sls deploy -s production",
+    "find:videos": "sls invoke local -f findVideos -s local",
+    "find:videos:some": "sls invoke local -f findVideos -s local --data '{ \"limit\": 10, \"orderBy\": \"updated\", \"findNewVideos\": true, \"recheckVideos\": true }'",
+    "find:videos:prod": "sls invoke -f findVideos -s production --data '{ \"findNewVideos\": true, \"recheckVideos\": false }'",
+    "find:videos:some:prod": "sls invoke -l -f findVideos -s production --data '{ \"limit\": 250, \"findNewVideos\": true, \"recheckVideos\": false }'",
+    "find:videos:updated:prod": "sls invoke -l -f findVideos -s production --data '{ \"findNewVideos\": true, \"recheckVideos\": false, \"limit\": 10, \"orderBy\": \"updated\" }'",
+    "update:videos:recent": "sls invoke local -f updateRecentVideos -s local",
+    "update:videos:recent:prod": "sls invoke -l -f updateRecentVideos -s production --data '{ \"minLastPublished\": 5, \"orderBy\": \"published\", \"revalidate\": true }'",
+    "update:videos:older": "sls invoke local -f updateOlderVideos -s local --data '{ \"orderBy\": \"updated\", \"limit\": 500 }'",
+    "update:videos:older:prod": "sls invoke -l -f updateOlderVideos -s production --data '{ \"orderBy\": \"updated\", \"limit\": 500 }'",
+    "update:channels": "sls invoke local -f updateChannels -s local",
+    "update:channels:prod": "sls invoke -l -f updateChannels -s production",
+    "get:channels": "sls invoke local -f getChannels -s local --data '{ \"limit\": 3 }'",
+    "get:channels:prod": "sls invoke -l -f getChannels -s production --data '{ \"limit\": 3 }'",
+    "db:migrate:prod": "dotenv -e .env.production npx prisma migrate deploy",
     "prepare": "husky install"
   },
   "devDependencies": {
-    "@babel/core": "^7.18.9",
-    "@babel/preset-env": "^7.18.9",
+    "@babel/core": "^7.18.10",
+    "@babel/preset-env": "^7.18.10",
+    "@commitlint/cli": "^17.0.3",
+    "@commitlint/config-conventional": "^17.0.3",
     "babel-loader": "^8.2.5",
     "babel-loader-exclude-node-modules-except": "^1.2.1",
     "dotenv-cli": "^6.0.0",
-    "eslint-config-airbnb-base": "^15.0.0",
+    "eslint-config-airbnb": "^19.0.4",
     "eslint-config-prettier": "^8.5.0",
     "eslint-plugin-import": "^2.26.0",
     "eslint-plugin-prettier": "^4.2.1",
     "husky": "^8.0.1",
     "jsonfile": "^6.1.0",
     "prisma": "^4.1.1",
-    "serverless-dotenv-plugin": "^4.0.1",
-    "serverless-offline": "^9.1.2",
+    "serverless-dotenv-plugin": "^4.0.2",
+    "serverless-offline": "^9.1.3",
     "serverless-webpack": "^5.8.0",
     "serverless-webpack-prisma": "^1.1.0",
+    "terser-webpack-plugin": "^5.3.3",
     "webpack-node-externals": "^3.0.0",
     "webpack-node-module-types": "^1.2.2"
   },
   "dependencies": {
-    "@babel/plugin-transform-runtime": "^7.18.9",
+    "@babel/plugin-transform-runtime": "^7.18.10",
     "@babel/runtime": "^7.18.9",
     "@googleapis/youtube": "^6.0.0",
     "@prisma/client": "^4.1.1",
@@ -48,5 +63,10 @@
     "pluralize": "^8.0.0",
     "pretty-ms": "^8.0.0",
     "rss-parser": "^3.12.0"
+  },
+  "husky": {
+    "hooks": {
+      "commit-msg": "commitlint -E HUSKY_GIT_PARAMS"
+    }
   }
 }

@@ -8,8 +8,9 @@ import config from './config.js';
 
 // Look Mom, I'm using classes in JavaScript!
 class QuotaTracker {
-  constructor({ task, force = false }) {
+  constructor({ task, force = false, source }) {
     this.task = task;
+    this.source = source;
     this.force = force;
     this.usage = 0;
   }
@@ -26,7 +27,7 @@ class QuotaTracker {
     this.usage += quotaCost;
 
     try {
-      await addQuotaUsage({ endpoint, parts, points: quotaCost, task: this.task });
+      await addQuotaUsage({ endpoint, parts, points: quotaCost, task: this.task, source: this.source });
     } catch ({ message }) {
       warn(`Couldn't log quota usage: ${message}`);
     }

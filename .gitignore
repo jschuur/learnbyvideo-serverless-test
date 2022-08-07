@@ -1,6 +1,8 @@
 node_modules
 .serverless
 .webpack
+config/schedule*.json
+!config/schedule.sample.json
 .env
 .env.*
 tmp/*

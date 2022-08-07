@@ -1,0 +1,38 @@
+[
+  {
+    "functionName": "updateChannels",
+    "timeout": 90,
+    "rate": "cron(* * 31 2 ? *)",
+    "memorySize": 384,
+    "enabled": true
+  },
+  {
+    "functionName": "findVideos",
+    "rate": "cron(* * 31 2 ? *)",
+    "memorySize": 768,
+    "enabled": true,
+    "input": { "findNewVideos": true, "recheckVideos": true }
+  },
+  {
+    "functionName": "updateVideos",
+    "description": "Check videos for updates (no input)",
+    "rate": "cron(* * 31 2 ? *)",
+    "enabled": false
+  },
+  {
+    "functionName": "updateRecentVideos",
+    "handlerName": "updateVideos",
+    "rate": "cron(* * 31 2 ? *)",
+    "memorySize": 384,
+    "enabled": true,
+    "input": { "minLastPublished": 5, "orderBy": "published", "recheckVideos": true }
+  },
+  {
+    "functionName": "updateOlderVideos",
+    "handlerName": "updateVideos",
+    "rate": "cron(* * 31 2 ? *)",
+    "memorySize": 384,
+    "enabled": true,
+    "input": { "limit": 500, "orderBy": "updated" }
+  }
+]

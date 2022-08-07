@@ -168,6 +168,7 @@ model QuotaUsage {
   parts    String?
   points   Int
   task     String?
+  source   String?
 }
 
 enum QuotaUsageEndpoints {

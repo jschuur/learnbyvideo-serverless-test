@@ -3,6 +3,8 @@ const path = require('path');
 const babelLoaderExcludeNodeModulesExcept = require('babel-loader-exclude-node-modules-except');
 const nodeExternals = require('webpack-node-externals');
 const slsw = require('serverless-webpack');
+const TerserPlugin = require('terser-webpack-plugin');
+
 const getPureESMDependencies = require('./util/pureESMDependencies.js');
 
 const pureESMDependencies = getPureESMDependencies();
@@ -14,7 +16,16 @@ module.exports = {
   // Regexp makes sure externals handles formdata-polyfill/esm.min.js, but doesn't conflate date-fns with da†e-fns-tz
   externals: [nodeExternals({ allowlist: pureESMDependencies.map((dep) => RegExp(`^${dep}(/.*)?$`)) })],
   mode: slsw.lib.webpack.isLocal ? 'development' : 'production',
-  optimization: { concatenateModules: false },
+  optimization: {
+    concatenateModules: false,
+    minimizer: [
+      new TerserPlugin({
+        terserOptions: {
+          keep_fnames: true,
+        },
+      }),
+    ],
+  },
   resolve: { extensions: ['.js'] },
   module: {
     rules: [

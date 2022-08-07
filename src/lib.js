@@ -30,7 +30,7 @@ export async function checkForDeletedVideos({ originalVideos, latestVideos }) {
   // Get the difference between the videos we checked from the DB and what the API returned
   const deletedVideos = differenceBy(originalVideos, latestVideos, 'youtubeId');
 
-  if (deletedVideos?.length === 0) return;
+  if (deletedVideos?.length === 0) return 0;
 
   console.log(
     `Identified ${pluralize('missing video', deletedVideos.length, true)}: ${deletedVideos
@@ -52,4 +52,6 @@ export async function checkForDeletedVideos({ originalVideos, latestVideos }) {
 
     await updateVideo({ youtubeId, status });
   }
+
+  return deletedVideos.length;
 }

@@ -17,7 +17,6 @@ export const getMonitoredChannels = ({ where = {}, ...options } = {}) =>
   getChannels({
     ...options,
     where: merge(where, { status: { in: ['ACTIVE', 'HIDDEN', 'MODERATED'] } }),
-    orderBy: { lastPublishedAt: 'desc' },
   });
 
 export const getVideos = (queryOptions) => prisma.video.findMany(queryOptions);
@@ -84,16 +83,17 @@ export async function upsertVideos(videos) {
   if (!videos?.length) return null;
 
   // Get the incrementing video ID to identify if an upsert added a new video
-  const lastVideoId = (
-    await prisma.video.findFirst({
-      select: {
-        id: true,
-      },
-      orderBy: {
-        id: 'desc',
-      },
-    })
-  ).id;
+  const lastVideoId =
+    (
+      await prisma.video.findFirst({
+        select: {
+          id: true,
+        },
+        orderBy: {
+          id: 'desc',
+        },
+      })
+    )?.id || 0;
 
   // Process videos grouped by channel
   for (const channelVideos of Object.values(groupBy(videos, (v) => v.channel.youtubeId))) {

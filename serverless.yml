@@ -10,37 +10,63 @@ plugins:
 custom:
   webpack:
     includeModules: true
+  # Added to the function block created by buildConfig.js
+  functions:
+    helloWorld:
+      handler: src/functions/helloWorld.handler
+      events:
+        - httpApi:
+            path: /helloWorld
+            method: get
 
 frameworkVersion: '3'
 
 provider:
   name: aws
   runtime: nodejs16.x
-  memorySize: 512
+  memorySize: 1024
 
-functions:
-  helloWorld:
-    handler: src/functions/hello.handler
-    events:
-      - httpApi:
-          path: /helloWorld
-          method: get
-  channelTest:
-    handler: src/functions/channelTest.handler
-    events:
-      - httpApi:
-          path: /channelTest
-          method: get
-      - schedule:
-          # rate: rate(1 minute)
-          rate: cron(12 */12 * * ? *)
-          enabled: false
-          input:
-            count: 20
-  updateChannels:
-    handler: src/functions/updateChannels.handler
-    timeout: 900
-    events:
-      - schedule:
-          rate: cron(12 */12 * * ? *)
-          enabled: false
+functions: ${file(./util/buildConfig.js):functions}
+# functions:
+#   helloWorld:
+#     handler: src/hello.handler
+#     events:
+#       - httpApi:
+#           path: '/helloWorld'
+#           method: get
+#   updateChannels:
+#     handler: src/functions.updateChannelsHandler
+#     timeout: 120
+#     events:
+#       - schedule:
+#           rate: cron(12 */12 * * ? *)
+#           enabled: false
+#   findVideos:
+#     handler: src/functions.findVideosHandler
+#     timeout: 900
+#     events:
+#       - schedule:
+#           rate: cron(55 * * * ? *)
+#           enabled: false
+#           # input: '{ \"limit\": 10, \"findNewVideos\": true, \"recheckVideos\": true }'
+#           input:
+#             limit: 20
+#   updateRecentVideos:
+#     handler: src/functions/updateVideos.handler
+#     timeout: 900
+#     events:
+#       - schedule:
+#           rate: cron(30 */4 * * * *)
+#           enabled: false
+#           input:
+#             minLastPublished: 5
+#             orderBy: published
+#             revalidate: true
+#   updateOlderVideos:
+#     handler: src/functions/updateVideos.handler
+#     timeout: 900
+#     events:
+#       - schedule:
+#           rate: cron(15 * * * * *)
+#           enabled: false
+#           input: { \"limit\": 500, \"orderBy"\: \"updated\" }

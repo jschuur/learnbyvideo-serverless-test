@@ -1,6 +1,16 @@
 // Allow the .env file to override any config constant
+import { merge } from 'lodash';
+
 const defaultValues = (defs) =>
   defs.reduce((acc, [name, value]) => ({ ...acc, [name]: process.env[name] || value }), {});
+
+const getFunctionDefaults = ({ defaults, functionName, handlerName, serverless }) =>
+  merge(
+    {},
+    ...[defaults[handlerName], defaults[functionName]].map(({ serverlessOnly, ...rest } = {}) =>
+      serverless ? merge({}, rest, serverlessOnly) : rest
+    )
+  );
 
 const config = {
   ...defaultValues([
@@ -19,10 +29,9 @@ const config = {
 
   taskQuotas: {
     all: 10000,
-    crawl_channels: 2000,
-    find_videos: 1000,
-    update_videos: 3000,
-    update_channels: 500,
+    findVideos: 1000,
+    updateVideos: 3000,
+    updateChannels: 500,
     add_channel: 2000,
   },
 
@@ -51,6 +60,34 @@ const config = {
     UNAVAILABLE: `This video isn't available anymore`,
     REMOVED: `This video has been removed by the uploader`,
   },
+
+  functionDefaults: ({ functionName, handlerName, serverless = false }) =>
+    getFunctionDefaults({
+      defaults: {
+        findVideos: {
+          findNewVideos: true,
+          recheckVideos: true,
+        },
+        updateVideos: {
+          orderBy: 'published',
+        },
+        updateRecentVideos: {
+          serverlessOnly: {
+            minLastPublished: 5,
+            recheckVideos: true,
+          },
+        },
+        updateOlderVideos: {
+          serverlessOnly: {
+            orderBy: 'updated',
+            limit: 500,
+          },
+        },
+      },
+      functionName,
+      handlerName,
+      serverless,
+    }),
 };
 
 export default config;
