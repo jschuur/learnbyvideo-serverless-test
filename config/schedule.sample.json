@@ -9,7 +9,7 @@
   {
     "functionName": "findVideos",
     "rate": "cron(* * 31 2 ? *)",
-    "memorySize": 768,
+    "memorySize": 512,
     "enabled": true,
     "input": { "findNewVideos": true, "recheckVideos": true }
   },
